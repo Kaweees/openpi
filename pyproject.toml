@@ -11,22 +11,23 @@ dependencies = [
     "einops>=0.8.0",
     "equinox>=0.11.8",
     "flatbuffers>=24.3.25",
-    "flax==0.10.2",
+    "flax==0.12.7",
     "fsspec[gcs]>=2024.6.0",
     "gym-aloha>=0.1.1",
     "imageio>=2.36.1",
-    "jax[cuda12]==0.5.3",
+    "jax==0.10.2",
     "jaxtyping==0.2.36",
     "lerobot",
     "ml_collections==1.0.0",
-    "numpy>=1.22.4,<2.0.0",
+    "numpy>=2,<3",
     "numpydantic>=1.6.6",
     "opencv-python>=4.10.0.84",
     "openpi-client",
-    "orbax-checkpoint==0.11.13",
+    "orbax-checkpoint==0.12.0",
     "pillow>=11.0.0",
     "sentencepiece>=0.2.0",
-    "torch==2.7.1",
+    "torch==2.9.1",
+    "torchcodec==0.9.1; platform_machine != 'aarch64'",
     "tqdm-loggable>=0.2",
     "typing-extensions>=4.12.2",
     "tyro>=0.9.5",
@@ -40,6 +41,14 @@ dependencies = [
     "polars>=1.30.0",
 ]
 
+
+[project.optional-dependencies]
+cuda12 = [
+    "jax[cuda12]==0.10.2",
+]
+cuda13 = [
+    "jax[cuda13]==0.10.2",
+]
 
 [project.urls]
 Repository = "https://github.com/Physical-Intelligence/openpi"
@@ -55,15 +64,21 @@ dev = [
     "pynvml>=12.0.0",
 ]
 rlds = [
-    # NOTE: tensorflow-cpu 2.15.0 only ships cp311 wheels on PyPI.
-    # Use `uv venv --python 3.11` before `uv sync --group rlds`.
     "dlimp",
-    "tensorflow-cpu==2.15.0",
+    "tensorflow-cpu==2.20.0",
     "tensorflow-datasets==4.9.9",
 ]
 
 [tool.uv]
-override-dependencies = ["ml-dtypes==0.4.1", "tensorstore==0.1.74"]
+# dlimp pins `tensorflow==2.15.0`, which predates numpy 2. The `rlds` group installs
+# `tensorflow-cpu` instead, so drop dlimp's requirement on the full `tensorflow` package.
+override-dependencies = ["tensorflow; sys_platform == 'never'"]
+conflicts = [
+    [
+        { extra = "cuda12" },
+        { extra = "cuda13" },
+    ],
+]
 
 [tool.uv.sources]
 openpi-client = { workspace = true }

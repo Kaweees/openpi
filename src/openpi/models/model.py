@@ -311,7 +311,7 @@ def restore_params(
         sharding = jax.sharding.NamedSharding(mesh, jax.sharding.PartitionSpec())
 
     with ocp.PyTreeCheckpointer() as ckptr:
-        metadata = ckptr.metadata(params_path)
+        metadata = ckptr.metadata(params_path).item_metadata
         item = {"params": metadata["params"]}
 
         params = ckptr.restore(

@@ -4,11 +4,11 @@ import jax
 import openpi.models.pi0_config as _pi0_config
 
 
-def _get_frozen_state(config: _pi0_config.Pi0Config) -> nnx.State:
+def _get_frozen_state(config: _pi0_config.Pi0Config) -> tuple[nnx.filterlib.PathParts, ...]:
     abstract_model = nnx.eval_shape(config.create, jax.random.key(0))
 
     freeze_filter = config.get_freeze_filter()
-    return nnx.state(abstract_model, nnx.All(nnx.Param, freeze_filter)).flat_state()
+    return nnx.to_flat_state(nnx.state(abstract_model, nnx.All(nnx.Param, freeze_filter))).paths
 
 
 def test_pi0_full_finetune():

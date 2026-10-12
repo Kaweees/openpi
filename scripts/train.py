@@ -101,7 +101,7 @@ def init_train_state(
 
         params = nnx.state(model)
         # Convert frozen params to bfloat16.
-        params = nnx_utils.state_map(params, config.freeze_filter, lambda p: p.replace(p.value.astype(jnp.bfloat16)))
+        params = nnx_utils.state_map(params, config.freeze_filter, lambda p: p.replace(p[...].astype(jnp.bfloat16)))
 
         return training_utils.TrainState(
             step=0,
@@ -180,7 +180,7 @@ def train_step(
         nnx.All(
             nnx.Param,
             nnx.Not(nnx_utils.PathRegex(".*/(bias|scale|pos_embedding|input_embedding)")),
-            lambda _, x: x.value.ndim > 1,
+            lambda _, x: x[...].ndim > 1,
         ),
     )
     info = {

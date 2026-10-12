@@ -45,9 +45,14 @@ git submodule update --init --recursive
 We use [uv](https://docs.astral.sh/uv/) to manage Python dependencies. See the [uv installation instructions](https://docs.astral.sh/uv/getting-started/installation/) to set it up. Once uv is installed, run the following to set up the environment:
 
 ```bash
-GIT_LFS_SKIP_SMUDGE=1 uv sync
+# For CUDA 12 machines:
+GIT_LFS_SKIP_SMUDGE=1 uv sync --extra cuda12
+# For CUDA 13 machines:
+GIT_LFS_SKIP_SMUDGE=1 uv sync --extra cuda13
 GIT_LFS_SKIP_SMUDGE=1 uv pip install -e .
 ```
+
+NOTE: pass the matching `--extra cuda12` / `--extra cuda13` flag on every `uv sync` invocation. A bare `uv sync` installs CPU-only JAX and removes the CUDA plugin from an existing environment.
 
 NOTE: `GIT_LFS_SKIP_SMUDGE=1` is needed to pull LeRobot as a dependency.
 
@@ -198,7 +203,7 @@ openpi now provides PyTorch implementations of π₀ and π₀.₅ models alongs
 - EMA (exponential moving average) weights during training
 
 ### Setup
-1. Make sure that you have the latest version of all dependencies installed: `uv sync`
+1. Make sure that you have the latest version of all dependencies installed: `uv sync --extra cuda12` (or `--extra cuda13`)
 
 2. Double check that you have transformers 4.53.2 installed: `uv pip show transformers`
 

@@ -8,12 +8,13 @@ for larger datasets like DROID -- they are working on improving it though). Belo
 
 ## Install
 
-We need a few additional dependencies for RLDS data loading. The RLDS group depends on `tensorflow-cpu==2.15.0`, which only ships wheels for **Python 3.11**. Make sure you create your virtual environment with Python 3.11 before syncing:
+We need a few additional dependencies for RLDS data loading, which are installed via the `rlds` dependency group. Pass the CUDA extra matching your machine as well, otherwise JAX is installed CPU-only:
 
 ```bash
-uv python install 3.11
-uv venv --python 3.11
-uv sync --group rlds
+# For CUDA 12 machines:
+GIT_LFS_SKIP_SMUDGE=1 uv sync --extra cuda12 --group rlds
+# For CUDA 13 machines:
+GIT_LFS_SKIP_SMUDGE=1 uv sync --extra cuda13 --group rlds
 ```
 
 ## Download DROID dataset

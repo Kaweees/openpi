@@ -127,6 +127,20 @@ class FakeDataset(Dataset):
         return self._num_samples
 
 
+def get_video_backend() -> str:
+    """Pick the video decoding backend for LeRobot datasets.
+
+    LeRobot defaults to torchcodec whenever the package is installed, but torchcodec only loads if a
+    compatible system FFmpeg is present. Fall back to pyav, which bundles its own FFmpeg, otherwise.
+    """
+    try:
+        import torchcodec  # noqa: F401
+    except Exception as e:  # torchcodec raises RuntimeError, not ImportError, when FFmpeg is missing.
+        logging.warning(f"torchcodec is unavailable ({type(e).__name__}); using the 'pyav' video backend instead.")
+        return "pyav"
+    return "torchcodec"
+
+
 def create_torch_dataset(
     data_config: _config.DataConfig, action_horizon: int, model_config: _model.BaseModelConfig
 ) -> Dataset:
@@ -143,6 +157,7 @@ def create_torch_dataset(
         delta_timestamps={
             key: [t / dataset_meta.fps for t in range(action_horizon)] for key in data_config.action_sequence_keys
         },
+        video_backend=get_video_backend(),
     )
 
     if data_config.prompt_from_task:
